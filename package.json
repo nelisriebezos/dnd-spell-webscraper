@@ -1,0 +1,21 @@
+{
+  "name": "dnd-spell-webscraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx ts-node src/main.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/cheerio": "^0.22.35",
+    "@types/node": "^20.12.12",
+    "axios": "^1.7.2",
+    "cheerio": "^1.0.0-rc.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
