@@ -1,8 +1,13 @@
-import axios from 'axios';
-import * as cheerio from 'cheerio';
+import { fetchPage } from './fetches';
+import { writeToJsonFile } from './fileWriter';
+import { extractSpellDetails } from './filters';
 
-// const url = 'http://dnd5e.wikidot.com/spells:cleric';
-const url = 'http://dnd5e.wikidot.com/spell:decompose';
+
+const spellContextFilterWords = ["Source: ", "Casting Time: ", "Range: ", "Components: ", "Duration: "];
+const mainWikiUrl = 'http://dnd5e.wikidot.com/';
+const clericSpellListUrl = 'http://dnd5e.wikidot.com/spells:cleric';
+const exampleSpellUrl = 'http://dnd5e.wikidot.com/spell:decompose';
+const spellContentId = '#page-content';
 const tabs = [
     'wiki-tab-0-0',
     'wiki-tab-0-1',
@@ -16,17 +21,9 @@ const tabs = [
     'wiki-tab-0-9'
 ]
 
-const fetchPage = async (url: string) => {
-  try {
-    const { data } = await axios.get(url);
-    return cheerio.load(data);
-  } catch (error) {
-    console.error(`Error fetching ${url}:`, error);
-    return null;
-  }
-};
 
-const findHrefInTableRows = (id: string, page: cheerio.Root) => {
+
+const getSpellLogicFromSpell = (id: string, page: cheerio.Root) => {
     const tableRows = page(`#${id} table tr`);
     tableRows.each((index, row) => {
       const rowData: { [key: string]: string } = {};
@@ -34,31 +31,36 @@ const findHrefInTableRows = (id: string, page: cheerio.Root) => {
 
       if (link) {
         rowData['link'] = link;
-        console.log(`Row ${index} has a link: ${link}`)
+        getSpellLogic(mainWikiUrl + link);
       }
     });
   };
 
 const getSpellLogic = async (url: string) => {
     const page = await fetchPage(url);
-    if (!page) return;
+    if (!page) return "no String";
 
-    const contentDiv = page('#page-content');
-    console.log(contentDiv.text());
+    const contentDiv = page(spellContentId);
+    return contentDiv.text();
 }
 
 const main = async () => {
-    const page = await fetchPage(url);
+    const page = await fetchPage(clericSpellListUrl);
     if (!page) return;
 
-    const contentDiv = page('#page-content');
-    console.log(contentDiv.text());
-    
-//   const page = await fetchPage(url);
-//   if (!page) return;
+    const contentDivText = await getSpellLogic(exampleSpellUrl);
+    const result = extractSpellDetails(contentDivText);
+    writeToJsonFile(result);
+  };
 
-//   const contentDiv = page('#wiki-tab-0-0');
-//   findHrefInTableRows(tabs[0], page)
-};
+
+// const contentDiv = page('#wiki-tab-0-0');
+// getSpellLogicFromSpell(tabs[0], page)
+
+
+
+
+
+
 
 main();
