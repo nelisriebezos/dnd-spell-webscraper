@@ -1,6 +1,8 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
+const spellContentId = '#page-content';
+
 export const fetchPage = async (url: string) => {
     try {
       const { data } = await axios.get(url);
@@ -10,3 +12,11 @@ export const fetchPage = async (url: string) => {
       return null;
     }
   };
+
+export const fetchSpell = async (url: string) => {
+  const page = await fetchPage(url);
+  if (!page) return "no String";
+
+  const contentDiv = page(spellContentId);
+  return contentDiv.text();
+}

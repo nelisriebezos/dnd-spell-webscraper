@@ -1,10 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const filePath = path.join(__dirname, '/data/data.json');
+const dataDirectory = path.join(__dirname, '/data/');
 
-export const writeToJsonFile = (data: string) => {
+export const writeToJsonFile = (data: string, fileName: string) => {
+    const filePath = dataDirectory + fileName + '.json';
     const jsonContent = JSON.stringify(data);
+
+    if (!fs.existsSync(dataDirectory)) {
+        fs.mkdirSync(dataDirectory, { recursive: true });
+    }
 
     fs.writeFile(filePath, jsonContent, 'utf8', (err) => {
         if (err) {
