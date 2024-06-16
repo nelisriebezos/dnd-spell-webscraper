@@ -16,9 +16,7 @@ export const getSpellAsJson = (input: string): any => {
         break;
       case line.startsWith("Components:"):
         const components = line.replace("Components:", "").trim();
-        spellDetails["Components"] = components
-          .split(",")
-          .map((component) => component.trim());
+        spellDetails["Components"] = parseComponents(components);
         break;
       case line.startsWith("Duration:"):
         spellDetails["Duration"] = line.replace("Duration:", "").trim();
@@ -37,6 +35,18 @@ export const getSpellAsJson = (input: string): any => {
 
   spellDetails["Description"] = descriptionLines.join(" ").trim();
   return spellDetails;
+};
+
+const parseComponents = (components: string): string[] => {
+  const componentList: string[] = [];
+  const regex = /(V|S|M(?: \([^)]+\))?)/g;
+  let match;
+
+  while ((match = regex.exec(components)) !== null) {
+    componentList.push(match[0]);
+  }
+
+  return componentList;
 };
 
 export const getClassJson = (input: Spell[], className: string): any => {
